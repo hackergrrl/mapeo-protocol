@@ -5,26 +5,17 @@ const PLAINTEXT_PROTOCOL_VERSION = '1.0.0'
 const SECURE_PROTOCOL_VERSION = '1.0.0'
 
 const rpcManifest = {
-  hello: 'async',
-  stuff: 'source'
+  GetInfo: 'async',
+  CreateSecureChannel: 'duplex'
 }
 
 class MapeoProtocol {
   constructor () {
     const api = {
-      hello: this.rpcHello.bind(this),
-      values: this.rpcValues.bind(this),
-      GetInfo: this.rpcGetPeerInfo.bind(this)
+      GetInfo: this.rpcGetPeerInfo.bind(this),
+      CreateSecureChannel: this.rpcCreateSecureChannel.bind(this)
     }
     this.rpc = muxrpc(rpcManifest, rpcManifest)(api)
-  }
-
-  rpcHello (name, cb) {
-    cb(null, 'hello, ' + name + '!')
-  }
-
-  rpcValues () {
-    return pull.values([1, 2, 3, 4, 5])
   }
 
   rpcGetPeerInfo (cb) {
@@ -32,6 +23,11 @@ class MapeoProtocol {
       plaintextProtocolVersion: PLAINTEXT_PROTOCOL_VERSION,
       secureProtocolVersion: SECURE_PROTOCOL_VERSION
     })
+  }
+
+  // TODO: implementation
+  rpcCreateSecureChannel () {
+    return null
   }
 
   createStream () {

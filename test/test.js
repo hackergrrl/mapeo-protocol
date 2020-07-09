@@ -15,7 +15,7 @@ test('can create & get duplex stream', function (t) {
   }
 })
 
-test('test rpc: GetPeerInfo', function (t) {
+test('rpc: GetPeerInfo', function (t) {
   t.plan(3)
 
   const proto1 = new Protocol()
@@ -30,24 +30,5 @@ test('test rpc: GetPeerInfo', function (t) {
     t.same(res.secureProtocolVersion, '1.0.0', 'secure protocol version ok')
     t.same(res.plaintextProtocolVersion, '1.0.0', 'plaintext protocol version ok')
   })
-})
-
-test('test rpc: values', function (t) {
-  t.plan(2)
-
-  const proto1 = new Protocol()
-  const proto2 = new Protocol()
-  const stream1 = proto1.createStream()
-  const stream2 = proto2.createStream()
-
-  pull(stream1, stream2, stream1)
-
-  pull(
-    proto2.rpcValues(),
-    pull.collect(function (err, res) {
-      t.error(err)
-      t.deepEquals(res, [1,2,3,4,5], 'response ok')
-    })
-  )
 })
 
