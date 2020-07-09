@@ -1,4 +1,5 @@
 const muxrpc = require('muxrpc')
+const pull = require('pull-stream')
 
 const rpcManifest = {
   hello: 'async',
@@ -9,7 +10,7 @@ class MapeoProtocol {
   constructor () {
     const api = {
       hello: this.rpcHello.bind(this),
-      stuff: this.rpcStuff.bind(this)
+      values: this.rpcValues.bind(this)
     }
     this.rpc = muxrpc(rpcManifest, rpcManifest)(api)
   }
@@ -18,7 +19,7 @@ class MapeoProtocol {
     cb(null, 'hello, ' + name + '!')
   }
 
-  rpcStuff () {
+  rpcValues () {
     return pull.values([1, 2, 3, 4, 5])
   }
 
