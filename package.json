@@ -1,0 +1,23 @@
+{
+  "name": "mapeo-protocol",
+  "description": "Implementation of the Mapeo Protocol.",
+  "author": "Kira Oakley <kira@digital-democracy.org>",
+  "version": "0.0.0",
+  "repository": {
+    "url": "git://github.com/digidem/mapeo-protocol.git"
+  },
+  "homepage": "https://github.com/digidem/mapeo-protocol",
+  "bugs": "https://github.com/digidem/mapeo-protocol/issues",
+  "main": "index.js",
+  "scripts": {
+    "test": "tape test/*.js",
+    "lint": "standard"
+  },
+  "keywords": [],
+  "dependencies": {},
+  "devDependencies": {
+    "standard": "^14.3.4",
+    "tape": "^5.0.1"
+  },
+  "license": "ISC"
+}
