@@ -2,7 +2,7 @@ const muxrpc = require('muxrpc')
 const pull = require('pull-stream')
 
 const PLAINTEXT_PROTOCOL_VERSION = '1.0.0'
-const SECURE_PROTOCOL_VERSION = '1.0.0'
+const SECURE_PROTOCOL_VERSION    = '1.0.0'
 
 const rpcManifest = {
   GetInfo: 'async',
