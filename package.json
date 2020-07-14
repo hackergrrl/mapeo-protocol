@@ -16,7 +16,8 @@
   "keywords": [],
   "dependencies": {
     "muxrpc": "^6.5.0",
-    "pull-stream": "^3.6.14"
+    "pull-stream": "^3.6.14",
+    "timeout-refresh": "^1.0.2"
   },
   "devDependencies": {
     "standard": "^14.3.4",
