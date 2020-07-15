@@ -20,7 +20,9 @@
     "timeout-refresh": "^1.0.2"
   },
   "devDependencies": {
+    "getport": "^0.1.0",
     "standard": "^14.3.4",
+    "stream-to-pull-stream": "^1.7.3",
     "tape": "^5.0.1"
   },
   "license": "ISC"
