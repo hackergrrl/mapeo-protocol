@@ -1,22 +1,26 @@
 const muxrpc = require('muxrpc')
 const timer = require('timeout-refresh')
 
-const PROTOCOL_VERSION = '1.0.0'
+const PROTOCOL_VERSION = '6.0.0'
 
 function noop () {}
 
 const rpcManifest = {
   GetInfo: 'async',
   Heartbeat: 'async'
+  SyncMultifeed: 'duplex',
+  SyncMediaBlobs: 'duplex'
 }
 
-class UpgradeProtocol {
+class SyncProtocol {
   constructor (opts) {
     opts = opts || {}
 
     const api = {
       GetInfo: this.rpcGetPeerInfo.bind(this),
       Heartbeat: this.rpcHeartbeat.bind(this),
+      SyncMultifeed: this.rpcSyncMultifeed.bind(this),
+      SyncMediaBlobs: this.rpcSyncMediaBlobs.bind(this)
     }
     this.rpc = muxrpc(rpcManifest, rpcManifest)(api)
     this.rpcStream = null
@@ -39,6 +43,14 @@ class UpgradeProtocol {
     this.timeout.refresh()
     this.heartbeat.refresh()
     cb()
+  }
+
+  rpcSyncMultifeed () {
+    throw new Error('not implemented')
+  }
+
+  rpcSyncMediaBlobs () {
+    throw new Error('not implemented')
   }
 
   createStream (cb) {
@@ -91,4 +103,5 @@ class UpgradeProtocol {
   }
 }
 
-module.exports = UpgradeProtocol
+module.exports = SyncProtocol
+
