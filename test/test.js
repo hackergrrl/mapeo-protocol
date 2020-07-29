@@ -5,7 +5,7 @@ const pull = require('pull-stream')
 const toPull = require('stream-to-pull-stream')
 const muxrpc = require('muxrpc')
 const helpers = require('./helpers')
-const Protocol = require('..')
+const Protocol = require('../upgrade-protocol')
 
 test('can create & get duplex stream', function (t) {
   t.plan(2)
@@ -21,7 +21,7 @@ test('can create & get duplex stream', function (t) {
 })
 
 test('rpc: GetPeerInfo', function (t) {
-  t.plan(3)
+  t.plan(2)
 
   const proto1 = new Protocol()
   const proto2 = new Protocol()
@@ -32,8 +32,7 @@ test('rpc: GetPeerInfo', function (t) {
 
   proto1.rpcGetPeerInfo((err, res) => {
     t.error(err)
-    t.same(res.secureProtocolVersion, '1.0.0', 'secure protocol version ok')
-    t.same(res.plaintextProtocolVersion, '1.0.0', 'plaintext protocol version ok')
+    t.same(res.protocolVersion, '1.0.0', 'protocol version ok')
   })
 })
 
