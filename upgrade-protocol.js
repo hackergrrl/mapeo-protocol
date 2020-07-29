@@ -1,8 +1,7 @@
 const muxrpc = require('muxrpc')
 const timer = require('timeout-refresh')
 
-const PLAINTEXT_PROTOCOL_VERSION = '1.0.0'
-const SECURE_PROTOCOL_VERSION    = '1.0.0'
+const PROTOCOL_VERSION = '1.0.0'
 
 function noop () {}
 
@@ -12,7 +11,7 @@ const rpcManifest = {
   CreateSecureChannel: 'duplex'
 }
 
-class MapeoProtocol {
+class UpgradeProtocol {
   constructor (opts) {
     opts = opts || {}
 
@@ -31,10 +30,10 @@ class MapeoProtocol {
     this.heartbeat = null
   }
 
+  // Q: Do we even need this?
   rpcGetPeerInfo (cb) {
     cb(null, {
-      plaintextProtocolVersion: PLAINTEXT_PROTOCOL_VERSION,
-      secureProtocolVersion: SECURE_PROTOCOL_VERSION
+      protocolVersion: PROTOCOL_VERSION
     })
   }
 
@@ -98,4 +97,4 @@ class MapeoProtocol {
   }
 }
 
-module.exports = MapeoProtocol
+module.exports = UpgradeProtocol
