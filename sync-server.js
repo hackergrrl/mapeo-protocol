@@ -34,7 +34,7 @@ ms.server(function (socket) {
   proto.rpcGetPeerInfo(console.log)
 })
 
-ms.client('net:localhost:3333~shs:'+keys.publicKey.toString('base64'), function (err, stream) {
+ms.client('net:localhost:3334~shs:'+keys.publicKey.toString('base64'), function (err, socket) {
   if (err) throw err
   console.log('connected to secure sync protocol')
 

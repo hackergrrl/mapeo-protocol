@@ -7,7 +7,7 @@ function noop () {}
 
 const rpcManifest = {
   GetInfo: 'async',
-  Heartbeat: 'async'
+  Heartbeat: 'async',
   SyncMultifeed: 'duplex',
   SyncMediaBlobs: 'duplex'
 }
