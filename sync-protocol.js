@@ -27,15 +27,21 @@ class SyncProtocol {
 
     this.timeoutMs = opts.timeout || 20000
 
+    if (!opts.deviceName) throw new Error('must specify opts.deviceName')
+    if (!opts.deviceType) throw new Error('must specify opts.deviceType')
+    this.deviceName = opts.deviceName
+    this.deviceType = opts.deviceType
+
     // Timers
     this.timeout = null
     this.heartbeat = null
   }
 
-  // Q: Do we even need this?
   rpcGetPeerInfo (cb) {
     cb(null, {
-      protocolVersion: PROTOCOL_VERSION
+      protocolVersion: PROTOCOL_VERSION,
+      deviceName: this.deviceName,
+      deviceType: this.deviceType
     })
   }
 
