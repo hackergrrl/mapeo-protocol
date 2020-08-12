@@ -28,7 +28,6 @@ class UpgradeProtocol {
     this.heartbeat = null
   }
 
-  // Q: Do we even need this?
   rpcGetPeerInfo (cb) {
     cb(null, {
       protocolVersion: PROTOCOL_VERSION
