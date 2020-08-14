@@ -1,7 +1,9 @@
 const muxrpc = require('muxrpc')
+const Blob = require('abstract-blob-store')
 
 module.exports = {
-  createFakeApiIgnoreHeartbeats
+  createFakeApiIgnoreHeartbeats,
+  mediaStore
 }
 
 function createFakeApiIgnoreHeartbeats () {
@@ -15,3 +17,12 @@ function createFakeApiIgnoreHeartbeats () {
   }
   return muxrpc(rpcManifest, rpcManifest)(api)
 }
+
+function mediaStore () {
+  const store = Blob()
+  store.list = (cb) => {
+    return Object.keys(store.data)
+  }
+  return store
+}
+

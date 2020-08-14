@@ -22,7 +22,10 @@
     "timeout-refresh": "^1.0.2"
   },
   "devDependencies": {
+    "abstract-blob-store": "^3.3.5",
     "getport": "^0.1.0",
+    "multifeed": "^5.2.4",
+    "random-access-memory": "^3.1.1",
     "standard": "^14.3.4",
     "stream-to-pull-stream": "^1.7.3",
     "tape": "^5.0.1"

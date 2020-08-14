@@ -4,19 +4,25 @@ const test = require('tape')
 const pull = require('pull-stream')
 const toPull = require('stream-to-pull-stream')
 const muxrpc = require('muxrpc')
+const multifeed = require('multifeed')
+const ram = require('random-access-memory')
 const helpers = require('./helpers')
 const Protocol = require('../sync-protocol')
 
-const DEFAULT_OPTS = {
-  deviceName: 'test device',
-  deviceType: 'mobile'
+const DEFAULT_DEVICE_INFO = {
+  name: 'test device',
+  type: 'mobile'
+}
+
+function makeProtocol (opts) {
+  return new Protocol(multifeed(ram), helpers.mediaStore, DEFAULT_DEVICE_INFO, opts)
 }
 
 test('can create & get duplex stream', function (t) {
   t.plan(2)
 
   try {
-    const proto = new Protocol(DEFAULT_OPTS)
+    const proto = makeProtocol()
     const stream = proto.createStream()
     t.same(typeof stream.source, 'function', 'has source side')
     t.same(typeof stream.sink, 'function', 'has sink side')
@@ -28,8 +34,8 @@ test('can create & get duplex stream', function (t) {
 test('rpc: GetPeerInfo', function (t) {
   t.plan(4)
 
-  const proto1 = new Protocol(DEFAULT_OPTS)
-  const proto2 = new Protocol(DEFAULT_OPTS)
+  const proto1 = makeProtocol()
+  const proto2 = makeProtocol()
   const stream1 = proto1.createStream()
   const stream2 = proto2.createStream()
 
@@ -38,16 +44,16 @@ test('rpc: GetPeerInfo', function (t) {
   proto1.rpcGetPeerInfo((err, res) => {
     t.error(err)
     t.same(res.protocolVersion, '6.0.0', 'protocol version ok')
-    t.same(res.deviceName, DEFAULT_OPTS.deviceName, 'device name ok')
-    t.same(res.deviceType, DEFAULT_OPTS.deviceType, 'device type ok')
+    t.same(res.deviceName, 'test device', 'device name ok')
+    t.same(res.deviceType, 'mobile', 'device type ok')
   })
 })
 
 test('rpc: Heartbeat', function (t) {
   t.plan(2)
 
-  const proto1 = new Protocol(DEFAULT_OPTS)
-  const proto2 = new Protocol(DEFAULT_OPTS)
+  const proto1 = makeProtocol()
+  const proto2 = makeProtocol()
   const stream1 = proto1.createStream()
   const stream2 = proto2.createStream()
 
@@ -65,10 +71,10 @@ test('rpc: Heartbeat', function (t) {
 test('heartbeats keep connection alive', function (t) {
   t.plan(1)
 
-  const opts = Object.assign({ timeout: 100 }, DEFAULT_OPTS)
+  const opts = { timeout: 100 }
 
-  const proto1 = new Protocol(opts)
-  const proto2 = new Protocol(opts)
+  const proto1 = makeProtocol(opts)
+  const proto2 = makeProtocol(opts)
   const stream1 = proto1.createStream(prematureEnd)
   const stream2 = proto2.createStream(prematureEnd)
 
@@ -90,9 +96,9 @@ test('heartbeats keep connection alive', function (t) {
 test('protocol times out without heartbeat responses', function (t) {
   t.plan(2)
 
-  const opts = Object.assign({ timeout: 200 }, DEFAULT_OPTS)
+  const opts = { timeout: 200 }
 
-  const proto1 = new Protocol(opts)
+  const proto1 = makeProtocol(opts)
   const stream1 = proto1.createStream(onEnd)
   const stream2 = helpers.createFakeApiIgnoreHeartbeats().createStream()
 
@@ -114,11 +120,11 @@ test('protocol times out without heartbeat responses', function (t) {
 test('protocol detects the other side closing properly', function (t) {
   t.plan(3)
 
-  const opts = Object.assign({ timeout: 200 }, DEFAULT_OPTS)
+  const opts = { timeout: 200 }
 
-  const proto1 = new Protocol(opts)
+  const proto1 = makeProtocol(opts)
+  const proto2 = makeProtocol(opts)
   const stream1 = proto1.createStream(onEnd1)
-  const proto2 = new Protocol(opts)
   const stream2 = proto2.createStream(onEnd2)
 
   pull(stream1, stream2, stream1)
@@ -141,9 +147,9 @@ test('net: both sides detect a socket close; remote sees an error', function (t)
   t.plan(3)
 
   // Setup up protocol streams
-  const proto1 = new Protocol(DEFAULT_OPTS)
+  const proto1 = makeProtocol()
+  const proto2 = makeProtocol()
   const stream1 = proto1.createStream(onEnd1)
-  const proto2 = new Protocol(DEFAULT_OPTS)
   const stream2 = proto2.createStream(onEnd2)
 
   // Set up server & client

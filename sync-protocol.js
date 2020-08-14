@@ -12,8 +12,18 @@ const rpcManifest = {
 }
 
 class SyncProtocol {
-  constructor (opts) {
+  constructor (multifeed, mediaStore, deviceInfo, opts) {
     opts = opts || {}
+
+    if (!multifeed) throw new Error('must specify multifeed')
+    if (!mediaStore) throw new Error('must specify mediaStore')
+    if (!deviceInfo) throw new Error('must specify deviceInfo')
+    if (!deviceInfo.name) throw new Error('must specify deviceInfo.name')
+    if (!deviceInfo.type) throw new Error('must specify deviceInfo.type')
+    this.multifeed = multifeed
+    this.deviceName = deviceInfo.name
+    this.deviceType = deviceInfo.type
+
 
     const api = {
       GetInfo: this.rpcGetPeerInfo.bind(this),
@@ -25,11 +35,6 @@ class SyncProtocol {
     this.rpcStream = null
 
     this.timeoutMs = opts.timeout || 20000
-
-    if (!opts.deviceName) throw new Error('must specify opts.deviceName')
-    if (!opts.deviceType) throw new Error('must specify opts.deviceType')
-    this.deviceName = opts.deviceName
-    this.deviceType = opts.deviceType
 
     // Timers
     this.timeout = null
