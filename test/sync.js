@@ -69,7 +69,7 @@ test('rpc: Heartbeat', function (t) {
 })
 
 test('heartbeats keep connection alive', function (t) {
-  t.plan(1)
+  t.plan(4)
 
   const opts = { timeout: 100 }
 
@@ -86,10 +86,15 @@ test('heartbeats keep connection alive', function (t) {
 
   setTimeout(() => {
     t.pass('connection kept alive ok')
+    proto1.close(() => {
+      proto2.close(() => {
+        t.pass('close ok')
+      })
+    })
   }, 400)
 
   function prematureEnd (err) {
-    t.fail('protocol should not terminate')
+    t.error(err, 'protocol should not terminate')
   }
 })
 
