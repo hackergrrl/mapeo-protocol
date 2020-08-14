@@ -2,6 +2,7 @@ const muxrpc = require('muxrpc')
 const timer = require('timeout-refresh')
 const toPull = require('stream-to-pull-stream')
 const defer = require('pull-defer')
+const blobSync = require('blob-store-replication-stream')
 const util = require('./lib/util')
 
 const PROTOCOL_VERSION = '6.0.0'
@@ -23,6 +24,7 @@ class SyncProtocol {
     if (!deviceInfo.name) throw new Error('must specify deviceInfo.name')
     if (!deviceInfo.type) throw new Error('must specify deviceInfo.type')
     this.multifeed = multifeed
+    this.mediaStore = mediaStore
     this.deviceName = deviceInfo.name
     this.deviceType = deviceInfo.type
 
@@ -70,7 +72,7 @@ class SyncProtocol {
   }
 
   rpcSyncMediaBlobs () {
-    return util.errorDuplex(new Error('not implemented'))
+    return toPull.duplex(blobSync(this.mediaStore))
   }
 
   createStream (cb) {

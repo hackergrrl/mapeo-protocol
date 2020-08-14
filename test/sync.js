@@ -6,6 +6,8 @@ const toPull = require('stream-to-pull-stream')
 const muxrpc = require('muxrpc')
 const multifeed = require('multifeed')
 const ram = require('random-access-memory')
+const collect = require('collect-stream')
+const blobSync = require('blob-store-replication-stream')
 const helpers = require('./helpers')
 const Protocol = require('../sync-protocol')
 
@@ -242,6 +244,49 @@ test('rpc: SyncMultifeed', function (t) {
       proto1.multifeed.feeds()[0].get(0, (err, data) => {
         t.error(err, 'remote feed read ok')
         t.same(data.toString(), 'hello world')
+
+        // Triggers the remote to close cleanly too.
+        proto1.close()
+      })
+    }
+  }
+})
+
+test.only('rpc: SyncMediaBlobs', function (t) {
+  t.plan(4)
+
+  const proto1 = makeProtocol()
+  const proto2 = makeProtocol()
+  const stream1 = proto1.createStream()
+  const stream2 = proto2.createStream()
+
+  pull(
+    stream1,
+    helpers.onEnd(err => t.error(err, 'protocol end ok')),
+    stream2,
+    stream1
+  )
+
+  proto2.mediaStore.createWriteStream('test.png', doSync).end('<test data>')
+
+  function doSync () {
+    const remoteSync = proto1.rpcSyncMediaBlobs()
+    const localSync = toPull.duplex(blobSync(proto2.mediaStore))
+
+    pull(
+      remoteSync,
+      helpers.onEnd(err => {
+        t.error(err, 'sync end ok')
+        onDone()
+      }),
+      localSync,
+      remoteSync
+    )
+
+    function onDone () {
+      collect(proto1.mediaStore.createReadStream('test.png'), (err, res) => {
+        t.error(err, 'read media ok')
+        t.equal(res.toString(), '<test data>', 'media data ok')
 
         // Triggers the remote to close cleanly too.
         proto1.close()
