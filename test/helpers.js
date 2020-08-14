@@ -23,7 +23,7 @@ function createFakeApiIgnoreHeartbeats () {
 function mediaStore () {
   const store = Blob()
   store.list = (cb) => {
-    return Object.keys(store.data)
+    process.nextTick(cb, null, Object.keys(store.data))
   }
   return store
 }

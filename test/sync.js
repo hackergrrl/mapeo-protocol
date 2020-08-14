@@ -16,7 +16,7 @@ const DEFAULT_DEVICE_INFO = {
 
 function makeProtocol (opts) {
   const feeds = multifeed(ram, { contentEncoding: 'json' })
-  return new Protocol(feeds, helpers.mediaStore, DEFAULT_DEVICE_INFO, opts)
+  return new Protocol(feeds, helpers.mediaStore(), DEFAULT_DEVICE_INFO, opts)
 }
 
 test('can create & get duplex stream', function (t) {
