@@ -1,5 +1,7 @@
 const muxrpc = require('muxrpc')
 const timer = require('timeout-refresh')
+const toPull = require('stream-to-pull-stream')
+const defer = require('pull-defer')
 const util = require('./lib/util')
 
 const PROTOCOL_VERSION = '6.0.0'
@@ -56,7 +58,15 @@ class SyncProtocol {
   }
 
   rpcSyncMultifeed () {
-    return util.errorDuplex(new Error('not implemented'))
+    this.multifeed.ready(() => {
+      const inner = toPull.duplex(this.multifeed.replicate(false))
+      sink.resolve(inner.sink)
+      source.resolve(inner.source)
+    })
+
+    const sink = defer.sink()
+    const source = defer.source()
+    return { sink, source }
   }
 
   rpcSyncMediaBlobs () {

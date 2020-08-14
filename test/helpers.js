@@ -1,9 +1,11 @@
 const muxrpc = require('muxrpc')
 const Blob = require('abstract-blob-store')
+const pull = require('pull-stream')
 
 module.exports = {
   createFakeApiIgnoreHeartbeats,
-  mediaStore
+  mediaStore,
+  onEnd
 }
 
 function createFakeApiIgnoreHeartbeats () {
@@ -24,5 +26,9 @@ function mediaStore () {
     return Object.keys(store.data)
   }
   return store
+}
+
+function onEnd (cb) {
+  return pull.through(data => data, cb)
 }
 

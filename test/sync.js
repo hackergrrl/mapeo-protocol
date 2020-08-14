@@ -15,7 +15,8 @@ const DEFAULT_DEVICE_INFO = {
 }
 
 function makeProtocol (opts) {
-  return new Protocol(multifeed(ram), helpers.mediaStore, DEFAULT_DEVICE_INFO, opts)
+  const feeds = multifeed(ram, { contentEncoding: 'json' })
+  return new Protocol(feeds, helpers.mediaStore, DEFAULT_DEVICE_INFO, opts)
 }
 
 test('can create & get duplex stream', function (t) {
@@ -195,3 +196,57 @@ test('net: both sides detect a socket close; remote sees an error', function (t)
     t.error(err, 'stream 2 closed without errors')
   }
 })
+
+test('rpc: SyncMultifeed', function (t) {
+  t.plan(8)
+
+  const proto1 = makeProtocol()
+  const proto2 = makeProtocol()
+  const stream1 = proto1.createStream()
+  const stream2 = proto2.createStream()
+
+  pull(
+    stream1,
+    helpers.onEnd(err => t.error(err, 'protocol end ok')),
+    stream2,
+    stream1
+  )
+
+  proto2.multifeed.writer((err, feed) => {
+    t.error(err, 'created multifeed writer ok')
+    feed.append('hello world', err => {
+      t.error(err, 'feed append ok')
+      doSync()
+    })
+  })
+
+  function doSync () {
+    const remoteSync = proto1.rpcSyncMultifeed()
+    const localSync = toPull.duplex(proto2.multifeed.replicate(true))
+
+    pull(
+      remoteSync,
+      helpers.onEnd(err => {
+        t.error(err, 'sync end ok')
+        onDone()
+      }),
+      localSync,
+      remoteSync
+    )
+
+    function onDone () {
+      t.equal(proto1.multifeed.feeds().length, 1, 'one feed synced ok')
+      const localKey = proto1.multifeed.feeds()[0].key.toString('hex')
+      const remoteKey = proto2.multifeed.feeds()[0].key.toString('hex')
+      t.equal(remoteKey, localKey, 'correct feed synced ok')
+      proto1.multifeed.feeds()[0].get(0, (err, data) => {
+        t.error(err, 'remote feed read ok')
+        t.same(data.toString(), 'hello world')
+
+        // Triggers the remote to close cleanly too.
+        proto1.close()
+      })
+    }
+  }
+})
+

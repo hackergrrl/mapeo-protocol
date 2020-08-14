@@ -18,6 +18,7 @@
     "chloride": "^2.2.14",
     "multiserver": "^3.6.0",
     "muxrpc": "^6.5.0",
+    "pull-defer": "^0.2.3",
     "pull-stream": "^3.6.14",
     "timeout-refresh": "^1.0.2"
   },
