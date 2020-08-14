@@ -1,9 +1,8 @@
 const muxrpc = require('muxrpc')
 const timer = require('timeout-refresh')
+const util = require('./lib/util')
 
 const PROTOCOL_VERSION = '6.0.0'
-
-function noop () {}
 
 const rpcManifest = {
   GetInfo: 'async',
@@ -52,16 +51,16 @@ class SyncProtocol {
   }
 
   rpcSyncMultifeed () {
-    throw new Error('not implemented')
+    return util.errorDuplex(new Error('not implemented'))
   }
 
   rpcSyncMediaBlobs () {
-    throw new Error('not implemented')
+    return util.errorDuplex(new Error('not implemented'))
   }
 
   createStream (cb) {
     if (this.rpcStream) return false
-    cb = cb || noop
+    cb = cb || util.noop
 
     this.rpcStream = this.rpc.createStream(err => {
       this.onRpcClose(err)
@@ -98,7 +97,7 @@ class SyncProtocol {
   }
 
   close (err, cb) {
-    cb = cb || noop
+    cb = cb || util.noop
     if (this.rpcStream) {
       this.timeout.destroy()
       this.heartbeat.destroy()
